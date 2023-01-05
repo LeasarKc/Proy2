@@ -3,5 +3,5 @@
 
 #Para la materia Algoritmos y Programacion 2
 
-#De la Universidad Catolica Andes Belllo extension Guayana
+#De la Universidad Catolica Andres Belllo extension Guayana
 
