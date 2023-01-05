@@ -25,12 +25,13 @@ node* xor(node* n1, node* n2){
 void inicializarLista(lista *l){
     node *aux = NULL, *ant = NULL, *act = l->first;
 
-    while(act){
+    while(act){ //Recorrido
         aux=act;
         act= xor(ant, act->point); //LLama xor
         ant = aux;
         free(aux);
     }
+    l->first= l->last = NULL;
 }
 
 int esVacia(lista l){
@@ -40,49 +41,74 @@ int esVacia(lista l){
 }
 
 int insertarPrincipio(lista *l, int val){
-    node *newl=(node*)malloc(sizeof(node));
-    if(!newl)
+    node *newnd=(node*)malloc(sizeof(node));
+    if(!newnd)
         return 0;
 
-    newl->val = val;
-    newl->point = l->first;
-    l->first=newl;
-    if(newl->point);
-        newl->point->point = xor(newl->point->point ,l->first); //Llama xor
+    newnd->val = val;
+    newnd->point = l->first;
+    l->first=newnd;
+    if(newnd->point) //Si no es el primer elemento insertado
+        newnd->point->point = xor(newnd->point->point ,l->first); //Llama xor
+    else //Sino, hay que actuaizar last
+        l->last = newnd;
     return 1;
 }
 
 int insertarFinal(lista *l, int val){
-    node *newl=(node*)malloc(sizeof(node));
-    if(!newl)
+    node *newnd=(node*)malloc(sizeof(node));
+    if(!newnd)
         return 0;
 
-    newl->val = val;
-    newl->point = l->last;
-    l->last=newl;
-    if(newl->point);
-        newl->point->point = xor(newl->point->point ,l->last); //llama xor
+    newnd->val = val;
+    newnd->point = l->last;
+    l->last=newnd;
+
+    if(newnd->point) //Si no es el primero insertado
+        newnd->point->point = xor(newnd->point->point ,l->last); //llama xor
+    else //Sino hay que actualizar first
+        l->first = newnd;
     return 1;
 }
 
 int insertarOrdenado(lista *l, int val){
-    node *newl=(node*)malloc(sizeof(node)), *ant, *aux, *act = l->first;
+    node *newnd=(node*)malloc(sizeof(node)), *ant = NULL, *aux, *act = l->first;
 
-    if(!newl)
+    if(!newnd)
         return 0;
 
-    while(act && act->val<val){
-        aux=act;
-        act=xor(ant,act->point); //llama xor
-        ant=aux;
-    }
+    newnd->val = val;
 
-    newl->val = val;
-    newl->point = xor(ant,act); //llaman xor
-    aux = xor(ant->point, act); //actualiza nodo anterior
-    ant->point = xor(aux,newl);
-    aux = xor(ant, act->point); //actualiza nodo posterior
-    act->point= xor(aux, newl);
+    if(!l->first){ //Si es el primero en insetarse podemos omitir la mayoria del procedimiento
+        l->first = l->last = newnd;
+        newnd->point = NULL;
+    }
+    else{
+        while(act && act->val<val){ //Recorrido
+            aux=act;
+            act=xor(ant,act->point); //llama xor
+            ant=aux;
+        }
+
+        if(!act){ //Si es el ultio de la lista
+            newnd->point = ant; //Apunta directamente al anterior
+            ant->point = xor(ant->point, newnd); //Actualiza el anterior
+            l->last = newnd; //Actualiza last
+
+        }
+        else if (!ant){ //Si es el primero de la lista
+            newnd->point = act; //Apunta directamente al siguente
+            act->point = xor(act->point,newnd); //Actualiza el siguiente
+            l->first = newnd; //Actualiza first
+
+        }else{  //Si esta entre dos nodos
+            newnd->point = xor(ant,act); //Nuevo nodo guarda xor del anterior y posterior
+            aux = xor(ant->point, act); //actualiza nodo anterior
+            ant->point = xor(aux,newnd);
+            aux = xor(ant, act->point); //actualiza nodo posterior
+            act->point= xor(aux, newnd);
+        }
+    }
     return 1;
 }
 
@@ -90,11 +116,17 @@ int quitarInicio(lista *l){
     node *aux;
     int val = l->first->val;
 
-    aux = l->first;
-    l->first = l->first->point;
-    free(aux);
-    aux = xor(aux,l->first->point); //llaman xor
-    l->first->point = aux;
+    if(l->first == l->last){ //Si es el unico elemento de la lista
+        free(l->first);
+        l->first = l->last = NULL;
+
+    }else{
+        aux = l->first;
+        l->first = l->first->point;
+        free(aux);
+        aux = xor(aux,l->first->point); //llama xor
+        l->first->point = aux;
+    }
     return val;
 }
 
@@ -102,17 +134,23 @@ int quitarFinal(lista *l){
     node *aux;
     int val = l->last->val;
 
-    aux = l->last;
-    l->last = l->last->point;
-    free(aux);
-    aux = xor(aux,l->last->point); //llaman xor
-    l->last->point = aux;
+    if(l->first == l->last){ //Si es el unico elemento de la lista
+        free(l->last);
+        l->last = l->first = NULL;
+
+    }else{
+        aux = l->last;
+        l->last = l->last->point;
+        free(aux);
+        aux = xor(aux,l->last->point); //llaman xor
+        l->last->point = aux;
+    }
     return val;
 }
 
 int buscar(lista l, int val){
-    node *aux, *ant, *act = l.first;
-    while(act && act->val!= val){
+    node *aux, *ant = NULL, *act = l.first;
+    while(act && act->val!= val){ //Recorrido
         aux = act;
         act = xor(ant, act->point); //llaman xor
         ant = aux;
@@ -123,50 +161,66 @@ int buscar(lista l, int val){
 }
 
 int sacarPrimeraOcurrencia(lista *l, int val){
-    node *aux, *aux2, *ant, *act = l->first;
+    node *aux, *aux2, *ant = NULL, *act = l->first;
 
-    while(act && act->val != val){
-        aux = act;
-        act = xor(ant, act->point); //llaman xor
-        ant = aux;
+    if(l->first->val == val){
+        l->first->point->point = xor(l->first,l->first->point->point); //Actualiza el siguiente
+        aux = l->first;;
+        l->first = l->first->point;
+        free(aux);
+
+    }else{
+        while(act && act->val != val){ //Recorrido
+            aux = act;
+            act = xor(ant, act->point); //llaman xor
+            ant = aux;
+        }
+        if(!act)
+            return 0;
+
+        if(act == l->last){ //Si es el ultimo
+            l->last->point->point = xor(l->last, l->last->point->point);
+            aux = l->last;
+            l->last = l->last->point;
+            free(aux);
+
+        }else{ //Si esta entre dos nodos
+            aux = act;
+            act = xor(ant, aux->point);   //reasignar apuntador posterior
+            aux2 = xor(aux,act->point);
+            act->point = xor(ant,aux2);
+            aux2 = xor(aux,ant->point);    //reasignar apuntador anterior
+            ant->point = xor(act,aux2);
+            free(aux);
+        }
     }
-    if(!act)
-        return 0;
-
-    aux = act;
-    act = xor(ant, aux->point);   //reasignar apuntador posterior
-    aux2 = xor(aux,act->point);
-    act->point = xor(ant,aux2);
-    aux2 = xor(aux,ant->point);    //reasignar apuntador anterior
-    ant->point = xor(act,aux2);
-    free(aux);
     return 1;
 }
 
 void listarInicioFinal(lista l){
-    node *aux, *ant, *act = l.first;
-    while(act){
+    node *aux, *ant = NULL, *act = l.first;
+    while(act){ //Recorrido
         aux = act;
         act = xor(ant, act->point); //llama xor
         ant = aux;
-        printf("%d ", ant);
+        printf("%d ", ant->val);
     }
 }
 
 void listarFinalInicio(lista l){
-    node *aux, *ant, *act = l.last;
-    while(act){
+    node *aux, *ant = NULL, *act = l.last;
+    while(act){ //Recorrido
         aux = act;
         act = xor(ant, act->point); //llama xor
         ant = aux;
-        printf("%d ", ant);
+        printf("%d ", ant->val);
     }
 }
 
 int cantidadElementos(lista l){
-    node *aux, *ant, *act = l.last;
-    int elem;
-    while(act){
+    node *aux, *ant = NULL, *act = l.first;
+    int elem = 0;
+    while(act){ //Recorrido
         aux = act;
         act = xor(ant, act->point); //llama xor
         ant = aux;
