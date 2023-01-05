@@ -1,4 +1,10 @@
-
+/**********************************************************************
+main del primer proyecto de:
+Algoritmos y Programacion II
+Por:
+Diego Peña
+Luis Enrique Salazar
+***********************************************************************/
 
 typedef struct node{
     int val;
@@ -10,24 +16,30 @@ typedef struct lista {
     node *last;
 }lista;
 
-lista crearLista();
+lista crearLista(); //Crea una lista nueva
 
-void inicializarLista(lista*);
+node* xor(node*, node*); //Funcion para hacer xor entre dos nodos
 
-int esVacia(lista l);
+void inicializarLista(lista*); //Borra todos los elementos de la lista
 
-int insertarPrincipio(lista *l,int val);
+int esVacia(lista l); //Indica si la lista esta vacia o no
 
-int insertarFinal(lista *l, int val);
+int insertarPrincipio(lista *l,int val); //Inserta un elemento al principio
 
-int insertarOrdenado(lista *l, int val);
+int insertarFinal(lista *l, int val); //Inserta un elemento al final
 
-int quitarInicio(lista *l);
+int insertarOrdenado(lista *l, int val); //Inserta un elemento ordenadamente
 
-int quitarFinal(lista *l);
+int quitarInicio(lista *l); //Quita el primer elemento
 
-void listarInicioFinal(lista);
+int quitarFinal(lista *l); //Quita el ultimo elemento
 
-void listarFinalInicio(lista);
+int sacarPrimeraOcurrencia(lista*, int); //Saca la primera ocurrencia del elemento
 
-int buscar(lista l, int val);
+void listarInicioFinal(lista); //Imprime los elementos de principio a fin
+
+void listarFinalInicio(lista); //Imprime los elementos de fin a principio
+
+int buscar(lista l, int val); //Indica si un elemento esta en la lista o no
+
+int cantidadElementos(lista); //Cuenta la cantidad de elementos de

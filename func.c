@@ -1,5 +1,14 @@
+/**********************************************************************
+main del primer proyecto de:
+Algoritmos y Programacion II
+Por:
+Diego Peña
+Luis Enrique Salazar
+***********************************************************************/
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "lib.h"
 
 lista crearLista(){
@@ -8,12 +17,17 @@ lista crearLista(){
     return newl;
 }
 
+node* xor(node* n1, node* n2){
+    //uintptr_t para evitar la posibilidad de perder los punteros al castear
+    return (node*)((uintptr_t)n1^(uintptr_t)n2);
+}
+
 void inicializarLista(lista *l){
     node *aux = NULL, *ant = NULL, *act = l->first;
 
     while(act){
         aux=act;
-        //act= moverDerecha(ant, act->point);
+        act= xor(ant, act->point); //LLama xor
         ant = aux;
         free(aux);
     }
@@ -34,7 +48,7 @@ int insertarPrincipio(lista *l, int val){
     newl->point = l->first;
     l->first=newl;
     if(newl->point);
-    //    newl->point->point = newl->point->point ^l->first;
+        newl->point->point = xor(newl->point->point ,l->first); //Llama xor
     return 1;
 }
 
@@ -47,7 +61,7 @@ int insertarFinal(lista *l, int val){
     newl->point = l->last;
     l->last=newl;
     if(newl->point);
-    //    newl->point->point = newl->point->point ^l->last;
+        newl->point->point = xor(newl->point->point ,l->last); //llama xor
     return 1;
 }
 
@@ -59,16 +73,16 @@ int insertarOrdenado(lista *l, int val){
 
     while(act && act->val<val){
         aux=act;
-        //act=moveDerecha(ant,act->point)
+        act=xor(ant,act->point); //llama xor
         ant=aux;
     }
 
     newl->val = val;
-    //newl->point = ant^act;
-    //aux = ant->point ^ act; //actualiza nodo anterior
-    //ant->point = aux^newl;
-    //aux = ant ^ act->point;
-    //act->point= aux ^ newl;
+    newl->point = xor(ant,act); //llaman xor
+    aux = xor(ant->point, act); //actualiza nodo anterior
+    ant->point = xor(aux,newl);
+    aux = xor(ant, act->point); //actualiza nodo posterior
+    act->point= xor(aux, newl);
     return 1;
 }
 
@@ -79,7 +93,7 @@ int quitarInicio(lista *l){
     aux = l->first;
     l->first = l->first->point;
     free(aux);
-    //aux = aux^l->first->point;
+    aux = xor(aux,l->first->point); //llaman xor
     l->first->point = aux;
     return val;
 }
@@ -91,7 +105,7 @@ int quitarFinal(lista *l){
     aux = l->last;
     l->last = l->last->point;
     free(aux);
-    //aux = aux^l->last->point;
+    aux = xor(aux,l->last->point); //llaman xor
     l->last->point = aux;
     return val;
 }
@@ -100,7 +114,7 @@ int buscar(lista l, int val){
     node *aux, *ant, *act = l.first;
     while(act && act->val!= val){
         aux = act;
-        //act = movDerecha(ant, act.point);
+        act = xor(ant, act->point); //llaman xor
         ant = aux;
     }
      if (!act)
@@ -113,18 +127,18 @@ int sacarPrimeraOcurrencia(lista *l, int val){
 
     while(act && act->val != val){
         aux = act;
-        //act = moveder(ant, act->point);
+        act = xor(ant, act->point); //llaman xor
         ant = aux;
     }
     if(!act)
         return 0;
 
     aux = act;
-    //act = ant ^ aux->point;   //reasignar apuntador posterior
-    //aux2 = aux^act->point;
-    //act->point = ant^aux2;
-    //aux2 = aux^ant->point;    //reasignar apuntador anterior
-    //ant->point = act^aux2;
+    act = xor(ant, aux->point);   //reasignar apuntador posterior
+    aux2 = xor(aux,act->point);
+    act->point = xor(ant,aux2);
+    aux2 = xor(aux,ant->point);    //reasignar apuntador anterior
+    ant->point = xor(act,aux2);
     free(aux);
     return 1;
 }
@@ -133,7 +147,7 @@ void listarInicioFinal(lista l){
     node *aux, *ant, *act = l.first;
     while(act){
         aux = act;
-        //act = movDer(ant, act.point);
+        act = xor(ant, act->point); //llama xor
         ant = aux;
         printf("%d ", ant);
     }
@@ -143,7 +157,7 @@ void listarFinalInicio(lista l){
     node *aux, *ant, *act = l.last;
     while(act){
         aux = act;
-        //act = movizq(ant, act.point);
+        act = xor(ant, act->point); //llama xor
         ant = aux;
         printf("%d ", ant);
     }
@@ -154,7 +168,7 @@ int cantidadElementos(lista l){
     int elem;
     while(act){
         aux = act;
-        //act = movizq(ant, act.point);
+        act = xor(ant, act->point); //llama xor
         ant = aux;
         elem++;
     }

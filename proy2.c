@@ -1,3 +1,11 @@
+/**********************************************************************
+main del primer proyecto de:
+Algoritmos y Programacion II
+Por:
+Diego Peña
+Luis Enrique Salazar
+***********************************************************************/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "lib.h"
@@ -52,7 +60,8 @@ int main(){
                 printf("Ingrese el elemento");
                 scanf("%d",elm);
 
-                if(!sacarPrimeraOcurrencia(&l))
+                elm = sacarPrimeraOcurrencia(&l, elm);
+                if(!elm)
                     printf("No se encontro el elemento");
                 else
                     printf("Se saco la primera ocurrencia");
@@ -60,8 +69,10 @@ int main(){
                 listarInicioFinal(l);
             case 11:
                 listarFinalInicio(l);
-            case 12:;
-                printf("La cantidad de elementos es de %d", cantidadElementos(l));
+            case 12:
+                elm = cantidadElementos(l);
+                printf("La cantidad de elementos es de %d", elm);
         }
     }
+    return 1;
 }
